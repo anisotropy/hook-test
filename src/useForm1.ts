@@ -9,20 +9,20 @@ type State = { value: string; error: string; isSubmitting: boolean };
 type Params = {
   state: State;
   submitter: (value: State["value"]) => Promise<void>;
-  stateSetter: (set: (state: State) => State) => void;
+  setState: (set: (state: State) => State) => void;
 };
 
-const formHandler = ({ state, submitter, stateSetter }: Params) => {
+const formHandler = ({ state, submitter, setState }: Params) => {
   const change = (value: string) => {
-    stateSetter((prev) => ({ ...prev, value }));
+    setState((prev) => ({ ...prev, value }));
   };
   const submit = async () => {
-    stateSetter((prev) => ({ ...prev, isSubmitting: true }));
+    setState((prev) => ({ ...prev, isSubmitting: true }));
     try {
       await submitter(state.value);
-      stateSetter((prev) => ({ ...prev, error: "", isSubmitting: false }));
+      setState((prev) => ({ ...prev, error: "", isSubmitting: false }));
     } catch (error) {
-      stateSetter((prev) => ({ ...prev, error: "error", isSubmitting: false }));
+      setState((prev) => ({ ...prev, error: "error", isSubmitting: false }));
     }
   };
   return { ...state, change, submit };
@@ -34,7 +34,7 @@ const useForm = () => {
     error: "",
     isSubmitting: false,
   });
-  return formHandler({ state, submitter: submitValue, stateSetter: setSate });
+  return formHandler({ state, submitter: submitValue, setState: setSate });
 };
 
 export { useForm, formHandler };

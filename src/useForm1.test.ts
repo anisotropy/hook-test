@@ -1,6 +1,6 @@
 import { waitFor } from "@testing-library/react";
 import { describe, test, expect } from "vitest";
-import { formHandler } from "./useForm";
+import { formHandler } from "./useForm1";
 
 type Params = Parameters<typeof formHandler>[0];
 type Result = ReturnType<typeof formHandler>;
@@ -18,7 +18,7 @@ const createParams = (params?: Partial<Params>): Params => ({
     await new Promise((r) => setTimeout(r, 100));
     if (value === "xxx") throw new Error("");
   },
-  stateSetter: () => undefined,
+  setState: () => undefined,
   ...params,
 });
 
@@ -87,11 +87,11 @@ describe("formHandler", () => {
     "$name",
     async ({ params, prevState, event, doExpect }) => {
       const state = { current: prevState };
-      const stateSetter: Params["stateSetter"] = (set) => {
+      const setState: Params["setState"] = (set) => {
         state.current = set(state.current);
       };
       const getResult = (state: Params["state"]) =>
-        formHandler({ ...params, state, stateSetter });
+        formHandler({ ...params, state, setState });
       event?.(getResult(state.current));
       await doExpect(() => getResult(state.current));
     }
