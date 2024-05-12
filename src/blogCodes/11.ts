@@ -40,11 +40,11 @@ const useRefState = <Ref>(initRef: Ref): [Ref, SetRef<Ref>] => {
   return [ref.current, setRef];
 };
 
-////
-
 const submitValue = async (value: string) => {
   if (value === "xxx") throw new Error("");
 };
+
+/////////////////////////////////////////////////////////////////////////////////////
 
 type State = { value: string; error: string; isSubmitting: boolean };
 
@@ -70,9 +70,9 @@ const formHandler =
     return { ...state, change, submit };
   };
 
-const useForm = createHook(formHandler)({
-  submitter: submitValue,
-})(() => useState(initState))();
+const useForm = createHook(formHandler)({ submitter: submitValue })(() =>
+  useState(initState)
+)();
 
 export type { Handler, SetState };
 
