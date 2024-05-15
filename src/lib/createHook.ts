@@ -1,6 +1,21 @@
-import { waitFor } from "@testing-library/react";
-import { describe, test, expect, Mock, vi } from "vitest";
-import { formHandler, Handler, SetRef, SetState } from "./useForm3";
+import { useRef } from "react";
+import { describe, test, Mock, vi } from "vitest";
+
+type SetState<S> = (set: (state: S) => S) => void;
+
+type SetRef<R> = SetState<R>;
+
+type CreateState<Params, S> = (params: Params) => [S, SetState<S>];
+
+type CreateRef<Params, R> = CreateState<Params, R>;
+
+type Handler<Params, Config, State, Ref, Result> = (handlerParams: {
+  config: Config;
+  state: State;
+  setState: SetState<State>;
+  ref: Ref;
+  setRef: SetRef<Ref>;
+}) => (params: Params) => Result;
 
 type Mocks = Record<string, Mock>;
 
@@ -22,6 +37,37 @@ type TestCase<Params, Config, State, Ref, Result> = {
 const mergeObj =
   <O>(obj: O) =>
   (partialObj?: Partial<O>): O => ({ ...obj, ...partialObj });
+
+const createHook =
+  <Params = void, Config = void, State = void, Ref = void, Result = void>(
+    handler: Handler<Params, Config, State, Ref, Result>
+  ) =>
+  (
+    hookParams: (Config extends void ? {} : { config: Config }) &
+      (State extends void ? {} : { createState: CreateState<Params, State> }) &
+      (Ref extends void ? {} : { createRef: CreateRef<Params, Ref> })
+  ) =>
+  (params: Params) => {
+    const config =
+      "config" in hookParams ? hookParams.config : (undefined as Config);
+    const [state, setState] =
+      "createState" in hookParams
+        ? hookParams.createState(params)
+        : ([] as unknown as ReturnType<CreateState<Params, State>>);
+    const [ref, setRef] =
+      "createRef" in hookParams
+        ? hookParams.createRef(params)
+        : ([] as unknown as ReturnType<CreateState<Params, Ref>>);
+    return handler({ config, state, setState, ref, setRef })(params);
+  };
+
+const useRefState = <Ref>(initRef: Ref): [Ref, SetRef<Ref>] => {
+  const ref = useRef(initRef);
+  const setRef = (set: (prev: Ref) => Ref) => {
+    ref.current = set(ref.current);
+  };
+  return [ref.current, setRef];
+};
 
 const hookTest =
   <Params = void, Config = void, State = void, Ref = void, Result = void>(
@@ -89,64 +135,5 @@ const hookTest =
     });
   };
 
-////
-
-hookTest(formHandler)({
-  name: "formHandler",
-  defaultConfig: {
-    submitter: async (value: string) => {
-      await new Promise((r) => setTimeout(r, 100));
-      if (value === "xxx") throw new Error("");
-    },
-  },
-  defaultState: {
-    value: "",
-    error: "",
-    isSubmitting: false,
-  },
-  testCases: [
-    {
-      name: "값을 변경하는 경우",
-      event: ({ result }) => {
-        result.change("a");
-      },
-      doExpect: ({ getResult }) => {
-        expect(getResult().value).toBe("a");
-      },
-    },
-    {
-      name: "submit 하는 경우",
-      prevState: { value: "a", isSubmitting: false, error: "error" },
-      event: ({ result }) => {
-        result.submit();
-      },
-      doExpect: async ({ getResult }) => {
-        expect(getResult().isSubmitting).toBe(true);
-        await waitFor(() => {
-          const { isSubmitting, error } = getResult();
-          expect({ isSubmitting, error }).toEqual({
-            isSubmitting: false,
-            error: "",
-          });
-        });
-      },
-    },
-    {
-      name: "submit을 할 때 에러가 발생하는 경우",
-      prevState: { value: "xxx", isSubmitting: false, error: "" },
-      event: ({ result }) => {
-        result.submit();
-      },
-      doExpect: async ({ getResult }) => {
-        expect(getResult().isSubmitting).toBe(true);
-        await waitFor(() => {
-          const { isSubmitting, error } = getResult();
-          expect({ isSubmitting, error }).toEqual({
-            isSubmitting: false,
-            error: "error",
-          });
-        });
-      },
-    },
-  ],
-});
+export type { TestCase };
+export { createHook, useRefState, hookTest };
