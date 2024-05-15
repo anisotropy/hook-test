@@ -52,19 +52,19 @@ const initState: State = { value: "", error: "", isSubmitting: false };
 
 const formHandler =
   (config: { submitter: typeof submitValue }) =>
-  (state: State, setSate: SetState<State>) =>
+  (state: State, setState: SetState<State>) =>
   () =>
   () => {
     const change = (value: string) => {
-      setSate((prev) => ({ ...prev, value }));
+      setState((prev) => ({ ...prev, value }));
     };
     const submit = async () => {
-      setSate((prev) => ({ ...prev, isSubmitting: true }));
+      setState((prev) => ({ ...prev, isSubmitting: true }));
       try {
         await config.submitter(state.value);
-        setSate((prev) => ({ ...prev, error: "", isSubmitting: false }));
+        setState((prev) => ({ ...prev, error: "", isSubmitting: false }));
       } catch (error) {
-        setSate((prev) => ({ ...prev, error: "error", isSubmitting: false }));
+        setState((prev) => ({ ...prev, error: "error", isSubmitting: false }));
       }
     };
     return { ...state, change, submit };

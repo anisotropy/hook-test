@@ -31,10 +31,10 @@ const formHandler = ({ state, submitter, setState }: Params) => {
 };
 
 const useForm = () => {
-  const [state, setSate] = useState<State>({
+  const [state, setState] = useState<State>({
     value: "",
     error: "",
     isSubmitting: false,
   });
-  return formHandler({ state, submitter: submitValue, setState: setSate });
+  return formHandler({ state, submitter: submitValue, setState: setState });
 };

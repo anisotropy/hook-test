@@ -78,9 +78,13 @@ const createTest =
             ref.current = set(ref.current);
           };
           const getResult = (state: State, ref: Ref) =>
-            handler(createConfig(config))(state, setState)(ref, setRef)(
-              createParams(params)
-            );
+            handler({
+              config: createConfig(config),
+              state,
+              setState,
+              ref,
+              setRef,
+            })(createParams(params));
           event?.(getResult(state.current, ref.current));
           await doExpect({
             getResult: () => getResult(state.current, ref.current),

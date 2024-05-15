@@ -30,7 +30,7 @@ type State = { value: string; error: string; isSubmitting: boolean };
 const formHandler = (
   config: { submitter: (value: State["value"]) => Promise<void> },
   state: State,
-  setSate: SetState<State>
+  setState: SetState<State>
 ) => {
   ...
 };
