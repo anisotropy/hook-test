@@ -1,4 +1,4 @@
-# test-hook
+# hook-test
 
 리액트를 이용한 프로젝트에서는 커스텀 훅을 많이 작성하고, 훅에 대한 테스트를 작성하는 경우도 많습니다. 커스턴 훅을 테스트 하기 위해 [`testing-library`](https://testing-library.com/)의 [`renderHook`](https://testing-library.com/docs/react-testing-library/api/#renderhook)을 사용할 수 있지만, `renderHook`의 단점은 커스텀 훅 내에 존재하는 상태를 직접 변경할 수는 없다는 것입니다. 이를 해결할 수 있는 한가지 방법은 훅의 로직을 그래돌 가지고 있으면서, 부수 효과를 일으키는 모든 암묵적 입출력은 제거된 함수(순수함수)를 작성하고, 이 함수를 테스트하는 것입니다.
 
