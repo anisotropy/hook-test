@@ -27,6 +27,8 @@ const submitValue = async (value: string) => {
 
 type State = { value: string; error: string; isSubmitting: boolean };
 
+const initState: State = { value: "", error: "", isSubmitting: false };
+
 const formHandler = (
   config: { submitter: (value: State["value"]) => Promise<void> },
   state: State,
@@ -48,12 +50,7 @@ const formHandler = (
 };
 
 const useForm = createHook(
-  () =>
-    useState<State>({
-      value: "",
-      error: "",
-      isSubmitting: false,
-    }),
+  () => useState<State>(initState),
   { submitter: submitValue },
   formHandler
 );
