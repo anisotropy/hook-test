@@ -74,6 +74,6 @@ const useForm = createHook(formHandler)({
   submitter: submitValue,
 })(() => useState(initState))();
 
-export type { Handler, SetState };
+export type { Handler, SetState, SetRef };
 
 export { useForm, formHandler };
