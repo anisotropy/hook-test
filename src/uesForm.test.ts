@@ -1,7 +1,7 @@
 import { waitFor } from "@testing-library/react";
-import { hookTest } from "./lib/createHook";
 import { formHandler } from "./useForm";
 import { expect, vi } from "vitest";
+import { hookTest } from "./lib/hookTest";
 
 hookTest(formHandler)({
   name: "formHandler",

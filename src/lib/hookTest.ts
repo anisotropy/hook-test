@@ -1,5 +1,5 @@
-import { Handler, SetRef, SetState } from "../useForm3";
 import { describe, test, Mock, vi } from "vitest";
+import { Handler, SetRef, SetState } from "./createHook";
 
 type Mocks = Record<string, Mock>;
 
@@ -87,3 +87,5 @@ const hookTest =
       );
     });
   };
+
+export { hookTest };

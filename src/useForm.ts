@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createHook } from "./lib/createHook";
+import { SetState, createHook } from "./lib/createHook";
 
 type State = { value: string; error: string; isSubmitting: boolean };
 

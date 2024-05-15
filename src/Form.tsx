@@ -1,7 +1,7 @@
-import { useForm } from "./useForm3";
+import { useForm } from "./useForm";
 
 const Form = () => {
-  const form = useForm();
+  const form = useForm({ initialValue: "abc", errorMessage: "error!" });
   return (
     <form
       onSubmit={(e) => {
