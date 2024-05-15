@@ -8,28 +8,35 @@ type CreateState<Params, S> = (params: Params) => [S, SetState<S>];
 
 type CreateRef<Params, R> = CreateState<Params, R>;
 
-type Handler<Params, Config, State, Ref, Result> = (
-  config: Config
-) => (
-  state: State,
-  setState: SetState<State>
-) => (ref: Ref, setRef: SetRef<Ref>) => (params: Params) => Result;
+type Handler<Params, Config, State, Ref, Result> = (handlerParams: {
+  config: Config;
+  state: State;
+  setState: SetState<State>;
+  ref: Ref;
+  setRef: SetRef<Ref>;
+}) => (params: Params) => Result;
 
 const createHook =
   <Params = void, Config = void, State = void, Ref = void, Result = void>(
     handler: Handler<Params, Config, State, Ref, Result>
   ) =>
-  (config: Config) =>
-  (createState: State extends void ? void : CreateState<Params, State>) =>
-  (createRef: Ref extends void ? void : CreateRef<Params, Ref>) =>
+  (
+    hookParams: (Config extends void ? {} : { config: Config }) &
+      (State extends void ? {} : { createState: CreateState<Params, State> }) &
+      (Ref extends void ? {} : { createRef: CreateRef<Params, Ref> })
+  ) =>
   (params: Params) => {
-    const [state, setState] = createState
-      ? createState(params)
-      : ([] as unknown as ReturnType<CreateState<Params, State>>);
-    const [ref, setRef] = createRef
-      ? createRef(params)
-      : ([] as unknown as ReturnType<CreateState<Params, Ref>>);
-    return handler(config)(state, setState)(ref, setRef)(params);
+    const config =
+      "config" in hookParams ? hookParams.config : (undefined as Config);
+    const [state, setState] =
+      "createState" in hookParams
+        ? hookParams.createState(params)
+        : ([] as unknown as ReturnType<CreateState<Params, State>>);
+    const [ref, setRef] =
+      "createRef" in hookParams
+        ? hookParams.createRef(params)
+        : ([] as unknown as ReturnType<CreateState<Params, Ref>>);
+    return handler({ config, state, setState, ref, setRef })(params);
   };
 
 const useRefState = <Ref>(initRef: Ref): [Ref, SetRef<Ref>] => {
@@ -41,19 +48,25 @@ const useRefState = <Ref>(initRef: Ref): [Ref, SetRef<Ref>] => {
 };
 
 const submitValue = async (value: string) => {
-  if (value === "xxx") throw new Error("");
+  if (value === "xxx3") throw new Error("");
 };
 
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 type State = { value: string; error: string; isSubmitting: boolean };
 
 const initState: State = { value: "", error: "", isSubmitting: false };
 
 const formHandler =
-  (config: { submitter: typeof submitValue }) =>
-  (state: State, setState: SetState<State>) =>
-  () =>
+  ({
+    config,
+    state,
+    setState,
+  }: {
+    config: { submitter: typeof submitValue };
+    state: State;
+    setState: SetState<State>;
+  }) =>
   () => {
     const change = (value: string) => {
       setState((prev) => ({ ...prev, value }));
@@ -70,10 +83,11 @@ const formHandler =
     return { ...state, change, submit };
   };
 
-const useForm = createHook(formHandler)({ submitter: submitValue })(() =>
-  useState(initState)
-)();
+const useForm = createHook(formHandler)({
+  config: { submitter: submitValue },
+  createState: () => useState(initState),
+});
 
-export type { Handler, SetState };
+export type { Handler, SetState, SetRef };
 
 export { useForm, formHandler };

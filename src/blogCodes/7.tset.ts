@@ -11,7 +11,7 @@ type TestCase<Config, State, Result> = {
   doExpect: (getResult: () => Result) => Promise<void> | void;
 };
 
-const createTest = <Config, State, Result>(params: {
+const hookTest = <Config, State, Result>(params: {
   name: string;
   handler: Handler<Config, State, Result>;
   defaultConfig: Config;

@@ -20,10 +20,10 @@ type TestCase<Params, Config, State, Ref, Result> = {
 };
 
 const mergeObj =
-  <O = void>(obj: O) =>
+  <O>(obj: O) =>
   (partialObj?: Partial<O>): O => ({ ...obj, ...partialObj });
 
-const createTest =
+const hookTest =
   <Params = void, Config = void, State = void, Ref = void, Result = void>(
     handler: Handler<Params, Config, State, Ref, Result>
   ) =>
@@ -98,7 +98,7 @@ const createTest =
 
 ////
 
-createTest(formHandler)({
+hookTest(formHandler)({
   name: "formHandler",
   defaultConfig: {
     submitter: async (value: string) => {

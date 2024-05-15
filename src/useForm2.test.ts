@@ -10,7 +10,7 @@ type TestCase<Config, State, Result> = {
   doExpect: (getResult: () => Result) => Promise<void> | void;
 };
 
-const createTest = <Config, State, Result>({
+const hookTest = <Config, State, Result>({
   name,
   handler,
   defaultConfig,
@@ -50,7 +50,7 @@ const createTest = <Config, State, Result>({
 
 ////
 
-createTest({
+hookTest({
   name: "formHandler",
   handler: formHandler,
   defaultConfig: {
